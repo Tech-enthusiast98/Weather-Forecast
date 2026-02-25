@@ -1,0 +1,47 @@
+<div class="current-weather-card glass-card" *ngIf="weather">
+  <div class="city-header">
+    <div>
+      <h2 class="city-name">{{ weather.city }} <span class="country-emoji">{{ weather.countryEmoji }}</span></h2>
+      <p class="country">{{ weather.country }}</p>
+    </div>
+    <div class="condition-badge">{{ weather.condition }}</div>
+  </div>
+
+  <div class="temp-section">
+    <div class="weather-icon">{{ getConditionIcon(weather.conditionCode) }}</div>
+    <div class="temperature">{{ weather.temperature }}<span class="unit">°C</span></div>
+  </div>
+
+  <p class="feels-like">Feels like <strong>{{ weather.feelsLike }}°C</strong></p>
+
+  <div class="metrics-grid">
+    <div class="metric">
+      <i class="bi bi-droplet-fill"></i>
+      <div>
+        <span class="metric-value">{{ weather.humidity }}%</span>
+        <span class="metric-label">Humidity</span>
+      </div>
+    </div>
+    <div class="metric">
+      <i class="bi bi-eye-fill"></i>
+      <div>
+        <span class="metric-value">{{ weather.visibility }} km</span>
+        <span class="metric-label">Visibility</span>
+      </div>
+    </div>
+    <div class="metric">
+      <i class="bi bi-sun-fill"></i>
+      <div>
+        <span class="metric-value">UV {{ weather.uvIndex }}</span>
+        <span class="metric-label">{{ getUvLabel(weather.uvIndex) }}</span>
+      </div>
+    </div>
+    <div class="metric">
+      <i class="bi bi-speedometer2"></i>
+      <div>
+        <span class="metric-value">{{ weather.pressure }} hPa</span>
+        <span class="metric-label">Pressure</span>
+      </div>
+    </div>
+  </div>
+</div>

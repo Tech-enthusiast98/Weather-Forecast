@@ -1,0 +1,16 @@
+<div class="forecast-card glass-card" *ngIf="forecast.length">
+    <div class="section-title"><i class="bi bi-calendar3"></i> 5-Day Forecast</div>
+    <div class="forecast-strip">
+        <div class="forecast-day" *ngFor="let day of forecast">
+            <div class="day-name">{{ day.date }}</div>
+            <div class="day-icon">{{ getIcon(day.conditionCode) }}</div>
+            <div class="day-temps">
+                <span class="high">{{ day.high }}°</span>
+                <span class="low">{{ day.low }}°</span>
+            </div>
+            <div class="day-rain">
+                <i class="bi bi-droplet"></i> {{ day.rainProbability }}%
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="sun-card glass-card" *ngIf="weather">
+    <div class="section-title"><i class="bi bi-brightness-high-fill"></i> Sunrise & Sunset</div>
+
+    <div class="arc-wrap">
+        <svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+            <!-- Horizon line -->
+            <line x1="10" y1="105" x2="290" y2="105" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+            <!-- Arc path -->
+            <path d="M10,105 Q150,5 290,105" fill="none" stroke="rgba(255,200,50,0.3)" stroke-width="2"
+                stroke-dasharray="4,4" />
+            <!-- Sun orb -->
+            <circle [attr.cx]="sunX" [attr.cy]="sunY" r="10" fill="#FFD700" filter="url(#glow)">
+                <animate attributeName="r" values="10;12;10" dur="3s" repeatCount="indefinite" />
+            </circle>
+            <!-- Glow filter -->
+            <defs>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+        </svg>
+    </div>
+
+    <div class="times-row">
+        <div class="time-block">
+            <i class="bi bi-sunrise-fill sunrise-icon"></i>
+            <div class="time-label">Sunrise</div>
+            <div class="time-value">{{ weather.sunrise }}</div>
+        </div>
+        <div class="day-length">
+            <div class="progress-pct">{{ sunProgress }}%</div>
+            <div class="progress-label">Day Progress</div>
+        </div>
+        <div class="time-block">
+            <i class="bi bi-sunset-fill sunset-icon"></i>
+            <div class="time-label">Sunset</div>
+            <div class="time-value">{{ weather.sunset }}</div>
+        </div>
+    </div>
+</div>

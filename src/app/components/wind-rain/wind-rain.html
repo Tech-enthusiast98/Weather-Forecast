@@ -1,0 +1,35 @@
+<div class="wind-rain-card glass-card" *ngIf="weather">
+    <!-- Wind Section -->
+    <div class="section-title"><i class="bi bi-wind"></i> Wind</div>
+    <div class="wind-section">
+        <div class="compass-wrap">
+            <div class="compass">
+                <span class="dir n">N</span>
+                <span class="dir s">S</span>
+                <span class="dir e">E</span>
+                <span class="dir w">W</span>
+                <div class="arrow-wrap" [style.transform]="'rotate(' + weather.windDegree + 'deg)'">
+                    <div class="arrow"></div>
+                </div>
+            </div>
+        </div>
+        <div class="wind-info">
+            <div class="wind-speed">{{ weather.windSpeed }} <span class="unit">km/h</span></div>
+            <div class="wind-direction-label">Direction: <strong>{{ weather.windDirection }}</strong></div>
+            <div class="wind-tag"
+                [class]="weather.windSpeed > 30 ? 'tag-danger' : weather.windSpeed > 20 ? 'tag-warn' : 'tag-ok'">
+                {{ weather.windSpeed > 30 ? 'Strong Wind' : weather.windSpeed > 20 ? 'Moderate' : 'Light Breeze' }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Rain Section -->
+    <div class="section-title mt-3"><i class="bi bi-cloud-rain-fill"></i> Rain Probability</div>
+    <div class="rain-section">
+        <div class="rain-pct">{{ weather.rainProbability }}%</div>
+        <div class="rain-bar-bg">
+            <div class="rain-bar-fill" [style.width.%]="weather.rainProbability"></div>
+        </div>
+        <div class="rain-label">{{ getRainLabel(weather.rainProbability) }} chance of rain</div>
+    </div>
+</div>

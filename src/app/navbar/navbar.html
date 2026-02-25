@@ -1,0 +1,28 @@
+<nav class="app-navbar">
+  <div class="navbar-brand">
+    <span class="brand-icon">🌤️</span>
+    <span class="brand-text">WeatherCast</span>
+  </div>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <i class="bi bi-search search-icon"></i>
+      <input type="text" id="city-search" class="search-input" placeholder="Search city..." [(ngModel)]="searchQuery"
+        (input)="onInput()" (keyup.enter)="onSearch()" (blur)="hideDropdown()" autocomplete="off" />
+      <button class="search-btn" (click)="onSearch()">
+        <i class="bi bi-arrow-right-circle-fill"></i>
+      </button>
+    </div>
+
+    <!-- Autocomplete dropdown -->
+    <div class="autocomplete-dropdown" *ngIf="showDropdown">
+      <div class="dropdown-item" *ngFor="let city of filteredCities" (mousedown)="selectCity(city)">
+        <i class="bi bi-geo-alt"></i> {{ city }}
+      </div>
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <span class="datetime">{{ allCities.length }} Cities Available</span>
+  </div>
+</nav>

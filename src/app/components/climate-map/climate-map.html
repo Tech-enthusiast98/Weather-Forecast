@@ -1,0 +1,46 @@
+<div class="map-card glass-card" *ngIf="weather">
+    <div class="section-title"><i class="bi bi-geo-alt-fill"></i> Climate Map
+        <span class="climate-badge">{{ weather.climateType }}</span>
+    </div>
+
+    <div class="map-container">
+        <!-- Stylised SVG World Map Silhouette -->
+        <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg" class="world-map">
+            <!-- Americas -->
+            <path d="M5,10 L12,10 L14,15 L12,22 L15,28 L13,35 L10,38 L8,32 L5,25 L3,18 Z" fill="rgba(255,255,255,0.08)"
+                stroke="rgba(255,255,255,0.2)" stroke-width="0.3" />
+            <path d="M12,12 L20,11 L22,16 L19,20 L16,23 L13,22 Z" fill="rgba(255,255,255,0.08)"
+                stroke="rgba(255,255,255,0.2)" stroke-width="0.3" />
+            <!-- Europe / Africa -->
+            <path d="M43,10 L55,10 L57,15 L54,22 L55,30 L52,35 L48,32 L45,25 L43,18 Z" fill="rgba(255,255,255,0.08)"
+                stroke="rgba(255,255,255,0.2)" stroke-width="0.3" />
+            <path d="M44,22 L54,22 L56,32 L52,42 L48,45 L44,42 L42,32 Z" fill="rgba(255,255,255,0.08)"
+                stroke="rgba(255,255,255,0.2)" stroke-width="0.3" />
+            <!-- Asia -->
+            <path d="M56,8 L85,8 L88,14 L84,20 L80,22 L72,24 L64,22 L57,18 Z" fill="rgba(255,255,255,0.08)"
+                stroke="rgba(255,255,255,0.2)" stroke-width="0.3" />
+            <path d="M65,20 L80,20 L82,30 L78,36 L72,38 L66,35 L63,27 Z" fill="rgba(255,255,255,0.08)"
+                stroke="rgba(255,255,255,0.2)" stroke-width="0.3" />
+            <!-- Australia -->
+            <path d="M76,52 L88,50 L90,56 L85,60 L78,59 L74,56 Z" fill="rgba(255,255,255,0.08)"
+                stroke="rgba(255,255,255,0.2)" stroke-width="0.3" />
+
+            <!-- All city dots -->
+            <g *ngFor="let pin of allPins">
+                <circle [attr.cx]="pin.x" [attr.cy]="pin.y" r="0.6" fill="rgba(255,255,255,0.3)" />
+            </g>
+
+            <!-- Active city pulse -->
+            <circle [attr.cx]="pinX" [attr.cy]="pinY" r="1.5" fill="rgba(251,191,36,0.4)">
+                <animate attributeName="r" values="1.5;3;1.5" dur="2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <circle [attr.cx]="pinX" [attr.cy]="pinY" r="1.2" fill="#FBBF24" />
+        </svg>
+    </div>
+
+    <div class="coords">
+        <i class="bi bi-geo"></i>
+        Lat {{ weather.latitude | number:'1.1-2' }}° &nbsp;|&nbsp; Lon {{ weather.longitude | number:'1.1-2' }}°
+    </div>
+</div>

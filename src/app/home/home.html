@@ -1,0 +1,42 @@
+<!-- Loading Spinner -->
+<div class="loading-wrap" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Fetching weather data...</p>
+</div>
+
+<!-- Not Found -->
+<div class="not-found" *ngIf="!loading && notFound">
+    <div class="nf-icon">🔍</div>
+    <h3>City Not Found</h3>
+    <p>Try searching for: London, Tokyo, Mumbai, New York, Paris, Dubai, Sydney, Berlin, Toronto, or Singapore.</p>
+</div>
+
+<!-- Dashboard -->
+<div class="dashboard fade-up" *ngIf="!loading && weatherData">
+    <!-- Row 1: Current weather (large) + Wind/Rain -->
+    <div class="dash-row row-top">
+        <div class="col-main">
+            <app-current-weather [weather]="weatherData.current" />
+        </div>
+        <div class="col-side">
+            <app-wind-rain [weather]="weatherData.current" />
+        </div>
+    </div>
+
+    <!-- Row 2: Sun times + Climate map -->
+    <div class="dash-row row-mid">
+        <div class="col-half">
+            <app-sun-times [weather]="weatherData.current" />
+        </div>
+        <div class="col-half">
+            <app-climate-map [weather]="weatherData.current" />
+        </div>
+    </div>
+
+    <!-- Row 3: 5-day forecast (full width) -->
+    <div class="dash-row row-bottom">
+        <div class="col-full">
+            <app-forecast [forecast]="weatherData.forecast" />
+        </div>
+    </div>
+</div>
