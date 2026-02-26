@@ -1,0 +1,134 @@
+# WeatherCast – Feature Expansion Plan
+
+Implementing **15 practical new features** grouped into 6 phases. All data remains mock (no API key needed). Real API integration is optional and can be layered in later by swapping [WeatherService](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/services/weather.service.ts#199-223).
+
+> [!NOTE]
+> Weather sounds and side-by-side compare are deferred — sounds need audio assets, and compare adds significant UI complexity beyond scope. All other 15 features below will be fully implemented.
+
+---
+
+## Phase 1 – Foundation Services
+
+### [MODIFY] [weather.model.ts](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/models/weather.model.ts)
+Add new interfaces:
+- `HourlyForecast` – hour label, temp, conditionCode, rainProb
+- `AirQuality` – aqi (0-500), pm25, co2, ozone, label ('Good'|'Moderate'|'Unhealthy'…)
+- `WeatherAlert` – title, message, severity ('info'|'warning'|'danger')
+- `HistoricalDay` – date, high, low
+- Extend [WeatherData](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/models/weather.model.ts#34-38) to include `hourly`, `airQuality`, `alerts[]`, `historical[]`
+
+### [NEW] `src/app/services/settings.service.ts`
+- `unit$: BehaviorSubject<'C'|'F'>` — temperature unit, persisted in `localStorage`
+- `theme$: BehaviorSubject<'dark'|'light'>` — theme, persisted in `localStorage`
+- `toggleUnit()`, `toggleTheme()` methods
+- On init, reads saved values from `localStorage` and applies `data-theme` attr on `<body>`
+
+### [NEW] `src/app/services/favourites.service.ts`
+- `favourites$: BehaviorSubject<string[]>` — list of favourite city names
+- `toggle(city)`, `isFavourite(city)`, persisted in `localStorage`
+
+### [NEW] `src/app/services/history.service.ts`
+- `history$: BehaviorSubject<string[]>` — last 5 searched cities
+- `add(city)`, `clear()`, persisted in `localStorage`
+
+---
+
+## Phase 2 – Navbar Upgrades
+
+### [MODIFY] [navbar.ts](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/navbar/navbar.ts) / [navbar.html](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/navbar/navbar.html) / [navbar.css](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/navbar/navbar.css)
+- Inject `SettingsService`, `FavouritesService`, `HistoryService`
+- Add **°C/°F toggle** pill button
+- Add **🌙/☀️ theme toggle** icon button  
+- Show **recent history chips** (click to re-search) in collapsible strip below search
+- Show **⭐ favourite cities** quick chips below history
+- Add **📍 Geolocation** button — calls `navigator.geolocation`, maps coords to nearest city
+
+---
+
+## Phase 3 – Home & Current Weather Upgrades
+
+### [MODIFY] [home.ts](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/home/home.ts) / [home.html](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/home/home.html) / [home.css](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/home/home.css)
+- Render dismissable **Weather Alert banner** if `weatherData.alerts.length > 0`
+- Apply a **dynamic CSS class** to `<body>` based on `conditionCode` (e.g. `bg-rainy`, `bg-sunny`) for animated background
+- Add `HourlyForecastComponent`, `AqiPanelComponent`, `HistoricalChartComponent` to dashboard layout
+- Subscribe to `HistoryService.add(city)` on each successful fetch
+- **Favourite (⭐) button** on HomeComponent header
+
+### [MODIFY] [current-weather.ts](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/components/current-weather/current-weather.ts) / [current-weather.html](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/components/current-weather/current-weather.html) / [current-weather.css](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/components/current-weather/current-weather.css)
+- Subscribe to `SettingsService.unit$` — display temp in selected unit
+- Replace plain temp display with **animated CSS weather icon** (pure CSS sun/rain/snow/cloud)
+- Replace flat humidity/UV metrics with **SVG circular progress rings**
+
+---
+
+## Phase 4 – New Components
+
+### [NEW] `src/app/components/hourly-forecast/`
+- 24-hour horizontal scrollable strip
+- Hour label, animated icon emoji, temperature (unit-aware), rain %
+- Current hour highlighted with gold border
+
+### [NEW] `src/app/components/aqi-panel/`
+- Air Quality Index panel
+- Large AQI number with colour-coded badge (green→red)
+- Mini horizontal bars for PM2.5, CO₂, Ozone
+
+### [NEW] `src/app/components/historical-chart/`
+- Install `chart.js` and `ng2-charts` 
+- 7-day line chart: high temp (orange) + low temp (blue) lines
+- Unit-aware via SettingsService
+
+### [NEW] `src/app/components/city-explorer/`
+- Full page at `/explore`
+- Card grid of all 10 cities — shows temp, condition icon, country emoji
+- Click a card → navigates to `/weather/:city`
+- Favourite toggle on each card
+
+---
+
+## Phase 5 – Routing & Geolocation
+
+### [MODIFY] [app.routes.ts](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/app.routes.ts)
+```typescript
+{ path: 'weather/:city', component: HomeComponent },
+{ path: 'explore', component: CityExplorerComponent },
+{ path: '', redirectTo: 'weather/London', pathMatch: 'full' },
+{ path: '**', redirectTo: 'weather/London' }
+```
+
+### [MODIFY] [home.ts](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/home/home.ts)
+- Read `:city` param from `ActivatedRoute` on init
+- When city changes via search, call `router.navigate(['/weather', city])`
+
+### Geolocation (in [navbar.ts](file:///c:/Users/AkshayakumarKM/.gemini/antigravity/playground/Angular/src/app/navbar/navbar.ts))
+- `navigator.geolocation.getCurrentPosition()` → lat/lng
+- Map to nearest mock city using Euclidean distance on stored lat/lng coords
+
+---
+
+## Phase 6 – Accessibility
+
+### All components
+- `role`, `aria-label` on buttons, search input, compass, SVG elements
+- SVG elements get `<title>` tags for screen readers
+- Keyboard navigation: `keydown.ArrowDown/Up` for autocomplete dropdown
+
+---
+
+## Verification Plan
+
+### Build Check
+```bash
+ng serve
+```
+- Zero console errors on all routes
+- All panels render with London on `/`, `/weather/London`
+
+### Manual Tests
+1. Toggle °C ↔ °F — all temps update across all panels
+2. Toggle dark ↔ light theme — persists on page reload
+3. Search "Tokyo" → URL updates to `/weather/tokyo`, history chip appears
+4. Star London → ⭐ shows in favourites strip, persists on reload
+5. Visit `/explore` → all 10 city cards render, click one → navigates to `/weather/:city`
+6. Click geolocation → nearest city loads
+7. Dismiss alert banner → it disappears
