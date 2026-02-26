@@ -12,7 +12,7 @@
 .city-name {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -22,13 +22,13 @@
 
 .country {
   font-size: 0.85rem;
-  color: rgba(255,255,255,0.6);
+  color: var(--text-muted);
   margin: 0;
 }
 
 .condition-badge {
-  background: rgba(251,191,36,0.2);
-  border: 1px solid rgba(251,191,36,0.4);
+  background: rgba(251, 191, 36, 0.2);
+  border: 1px solid rgba(251, 191, 36, 0.4);
   color: #FBBF24;
   padding: 4px 12px;
   border-radius: 20px;
@@ -53,7 +53,7 @@
 .temperature {
   font-size: 4rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   line-height: 1;
 }
 
@@ -64,48 +64,69 @@
 }
 
 .feels-like {
-  color: rgba(255,255,255,0.6);
+  color: var(--text-muted);
   font-size: 0.9rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
-.metrics-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* SVG Rings Row */
+.rings-row {
+  display: flex;
+  align-items: center;
   gap: 1rem;
 }
 
-.metric {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: rgba(255,255,255,0.05);
-  border-radius: 12px;
-  padding: 0.75rem;
+.ring-wrap {
+  flex: 1;
 }
 
-.metric i {
-  font-size: 1.3rem;
-  color: #60a5fa;
+.ring-svg {
+  width: 100%;
+  max-width: 90px;
+  display: block;
+  margin: 0 auto;
 }
 
-.metric div {
+.metric-pair {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
-.metric-value {
-  font-size: 0.95rem;
+.mp-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+}
+
+.mp-item i {
+  font-size: 1.1rem;
+  color: var(--accent-blue);
+}
+
+.mp-val {
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--text-primary);
 }
 
-.metric-label {
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.5);
+.mp-lbl {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: auto;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
 }

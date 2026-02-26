@@ -9,38 +9,52 @@
 
   <div class="temp-section">
     <div class="weather-icon">{{ getConditionIcon(weather.conditionCode) }}</div>
-    <div class="temperature">{{ weather.temperature }}<span class="unit">°C</span></div>
+    <div class="temperature">{{ getTemp(weather.temperature) }}<span class="unit">°{{ unit }}</span></div>
   </div>
 
-  <p class="feels-like">Feels like <strong>{{ weather.feelsLike }}°C</strong></p>
+  <p class="feels-like">Feels like <strong>{{ getTemp(weather.feelsLike) }}°{{ unit }}</strong></p>
 
-  <div class="metrics-grid">
-    <div class="metric">
-      <i class="bi bi-droplet-fill"></i>
-      <div>
-        <span class="metric-value">{{ weather.humidity }}%</span>
-        <span class="metric-label">Humidity</span>
-      </div>
+  <!-- SVG Rings for Humidity & UV -->
+  <div class="rings-row">
+    <div class="ring-wrap" role="img" [attr.aria-label]="'Humidity: ' + weather.humidity + '%'">
+      <svg viewBox="0 0 80 80" class="ring-svg">
+        <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="7" />
+        <circle cx="40" cy="40" r="36" fill="none" stroke="#60a5fa" stroke-width="7" stroke-dasharray="226"
+          [attr.stroke-dashoffset]="getHumidityOffset()" stroke-linecap="round" transform="rotate(-90 40 40)">
+          <animate attributeName="stroke-dashoffset" [attr.from]="226" [attr.to]="getHumidityOffset()" dur="1s"
+            fill="freeze" />
+        </circle>
+        <text x="40" y="38" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Inter">{{
+          weather.humidity }}%</text>
+        <text x="40" y="52" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8"
+          font-family="Inter">Humidity</text>
+      </svg>
     </div>
-    <div class="metric">
-      <i class="bi bi-eye-fill"></i>
-      <div>
-        <span class="metric-value">{{ weather.visibility }} km</span>
-        <span class="metric-label">Visibility</span>
-      </div>
+    <div class="ring-wrap" role="img"
+      [attr.aria-label]="'UV Index: ' + weather.uvIndex + ', ' + getUvLabel(weather.uvIndex)">
+      <svg viewBox="0 0 80 80" class="ring-svg">
+        <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="7" />
+        <circle cx="40" cy="40" r="36" fill="none" stroke="#FBBF24" stroke-width="7" stroke-dasharray="226"
+          [attr.stroke-dashoffset]="getUvOffset()" stroke-linecap="round" transform="rotate(-90 40 40)">
+        </circle>
+        <text x="40" y="38" text-anchor="middle" fill="#fff" font-size="12" font-weight="700" font-family="Inter">{{
+          weather.uvIndex }}</text>
+        <text x="40" y="52" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8" font-family="Inter">UV
+          Index</text>
+      </svg>
     </div>
-    <div class="metric">
-      <i class="bi bi-sun-fill"></i>
-      <div>
-        <span class="metric-value">UV {{ weather.uvIndex }}</span>
-        <span class="metric-label">{{ getUvLabel(weather.uvIndex) }}</span>
-      </div>
-    </div>
-    <div class="metric">
-      <i class="bi bi-speedometer2"></i>
-      <div>
-        <span class="metric-value">{{ weather.pressure }} hPa</span>
-        <span class="metric-label">Pressure</span>
+    <div class="ring-wrap">
+      <div class="metric-pair">
+        <div class="mp-item">
+          <i class="bi bi-eye-fill"></i>
+          <span class="mp-val">{{ weather.visibility }} km</span>
+          <span class="mp-lbl">Visibility</span>
+        </div>
+        <div class="mp-item">
+          <i class="bi bi-speedometer2"></i>
+          <span class="mp-val">{{ weather.pressure }} hPa</span>
+          <span class="mp-lbl">Pressure</span>
+        </div>
       </div>
     </div>
   </div>

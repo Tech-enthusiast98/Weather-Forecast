@@ -1,7 +1,29 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { WeatherData, CurrentWeather, DailyForecast } from '../models/weather.model';
+import { WeatherData, HourlyForecast, AirQuality, WeatherAlert, HistoricalDay } from '../models/weather.model';
+
+// Helper to build 24-hour mock data
+function makeHourly(baseTemp: number, conditionCode: string, rainProb: number): HourlyForecast[] {
+    const codes = ['sunny', 'partly-cloudy', conditionCode];
+    const now = new Date().getHours();
+    return Array.from({ length: 24 }, (_, i) => ({
+        hour: `${String(i).padStart(2, '0')}:00`,
+        temp: baseTemp + Math.round(Math.sin((i - 6) * Math.PI / 12) * 5),
+        conditionCode: i < 6 || i > 20 ? 'cloudy' : codes[i % 3],
+        rainProbability: i > 14 && i < 20 ? rainProb : Math.max(0, rainProb - 20),
+        isNow: i === now
+    }));
+}
+
+function makeHistorical(baseHigh: number, baseLow: number): HistoricalDay[] {
+    const labels = ['Feb 19', 'Feb 20', 'Feb 21', 'Feb 22', 'Feb 23', 'Feb 24', 'Feb 25'];
+    return labels.map((date, i) => ({
+        date,
+        high: baseHigh + Math.round((Math.random() - 0.5) * 4),
+        low: baseLow + Math.round((Math.random() - 0.5) * 3)
+    }));
+}
 
 const MOCK_DATA: Record<string, WeatherData> = {
     london: {
@@ -21,8 +43,13 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 10, low: 5, condition: 'Stormy', conditionCode: 'stormy', rainProbability: 90 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 12, low: 7, condition: 'Cloudy', conditionCode: 'cloudy', rainProbability: 60 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 15, low: 9, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 10 },
-        ]
+        ],
+        hourly: makeHourly(12, 'partly-cloudy', 45),
+        airQuality: { aqi: 42, pm25: 8.2, co2: 410, ozone: 32, label: 'Good', color: '#22c55e' },
+        alerts: [],
+        historical: makeHistorical(13, 7)
     },
+
     tokyo: {
         current: {
             city: 'Tokyo', country: 'Japan', countryEmoji: '🇯🇵',
@@ -40,8 +67,13 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 13, low: 6, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 5 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 10, low: 4, condition: 'Cloudy', conditionCode: 'cloudy', rainProbability: 35 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 8, low: 2, condition: 'Rainy', conditionCode: 'rainy', rainProbability: 70 },
-        ]
+        ],
+        hourly: makeHourly(8, 'sunny', 10),
+        airQuality: { aqi: 58, pm25: 12.1, co2: 415, ozone: 28, label: 'Moderate', color: '#eab308' },
+        alerts: [],
+        historical: makeHistorical(9, 3)
     },
+
     mumbai: {
         current: {
             city: 'Mumbai', country: 'India', countryEmoji: '🇮🇳',
@@ -59,8 +91,15 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 33, low: 25, condition: 'Partly Cloudy', conditionCode: 'partly-cloudy', rainProbability: 30 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 31, low: 24, condition: 'Cloudy', conditionCode: 'cloudy', rainProbability: 50 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 30, low: 24, condition: 'Rainy', conditionCode: 'rainy', rainProbability: 75 },
-        ]
+        ],
+        hourly: makeHourly(32, 'sunny', 20),
+        airQuality: { aqi: 158, pm25: 55.3, co2: 438, ozone: 44, label: 'Unhealthy', color: '#ef4444' },
+        alerts: [
+            { id: 'a1', title: '🌡️ Heat Advisory', message: 'Feels like 36°C. Stay hydrated and avoid outdoor activity between 11am–4pm.', severity: 'warning' }
+        ],
+        historical: makeHistorical(33, 25)
     },
+
     'new york': {
         current: {
             city: 'New York', country: 'United States', countryEmoji: '🇺🇸',
@@ -78,8 +117,15 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 9, low: 3, condition: 'Partly Cloudy', conditionCode: 'partly-cloudy', rainProbability: 20 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 11, low: 5, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 10 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 8, low: 2, condition: 'Rainy', conditionCode: 'rainy', rainProbability: 60 },
-        ]
+        ],
+        hourly: makeHourly(3, 'snowy', 70),
+        airQuality: { aqi: 72, pm25: 18.4, co2: 420, ozone: 38, label: 'Moderate', color: '#eab308' },
+        alerts: [
+            { id: 'b1', title: '❄️ Winter Storm Warning', message: 'Heavy snowfall expected. 4–6 inches predicted by midnight. Avoid non-essential travel.', severity: 'danger' }
+        ],
+        historical: makeHistorical(4, -1)
     },
+
     paris: {
         current: {
             city: 'Paris', country: 'France', countryEmoji: '🇫🇷',
@@ -97,8 +143,13 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 12, low: 7, condition: 'Partly Cloudy', conditionCode: 'partly-cloudy', rainProbability: 30 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 14, low: 8, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 15 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 13, low: 7, condition: 'Partly Cloudy', conditionCode: 'partly-cloudy', rainProbability: 25 },
-        ]
+        ],
+        hourly: makeHourly(10, 'cloudy', 55),
+        airQuality: { aqi: 48, pm25: 9.8, co2: 412, ozone: 31, label: 'Good', color: '#22c55e' },
+        alerts: [],
+        historical: makeHistorical(11, 6)
     },
+
     dubai: {
         current: {
             city: 'Dubai', country: 'UAE', countryEmoji: '🇦🇪',
@@ -116,8 +167,15 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 31, low: 22, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 2 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 29, low: 20, condition: 'Partly Cloudy', conditionCode: 'partly-cloudy', rainProbability: 10 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 28, low: 19, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 5 },
-        ]
+        ],
+        hourly: makeHourly(28, 'sunny', 5),
+        airQuality: { aqi: 88, pm25: 22.7, co2: 416, ozone: 36, label: 'Moderate', color: '#eab308' },
+        alerts: [
+            { id: 'c1', title: '☀️ High UV Alert', message: 'UV index reaching 8–10 today. Apply SPF 50+ sunscreen when outdoors.', severity: 'info' }
+        ],
+        historical: makeHistorical(29, 20)
     },
+
     sydney: {
         current: {
             city: 'Sydney', country: 'Australia', countryEmoji: '🇦🇺',
@@ -135,8 +193,13 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 25, low: 18, condition: 'Rainy', conditionCode: 'rainy', rainProbability: 65 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 23, low: 17, condition: 'Cloudy', conditionCode: 'cloudy', rainProbability: 40 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 26, low: 18, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 10 },
-        ]
+        ],
+        hourly: makeHourly(26, 'sunny', 15),
+        airQuality: { aqi: 28, pm25: 4.1, co2: 408, ozone: 25, label: 'Good', color: '#22c55e' },
+        alerts: [],
+        historical: makeHistorical(27, 19)
     },
+
     berlin: {
         current: {
             city: 'Berlin', country: 'Germany', countryEmoji: '🇩🇪',
@@ -154,8 +217,13 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 9, low: 3, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 10 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 8, low: 2, condition: 'Rainy', conditionCode: 'rainy', rainProbability: 60 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 5, low: 0, condition: 'Snowy', conditionCode: 'snowy', rainProbability: 50 },
-        ]
+        ],
+        hourly: makeHourly(5, 'cloudy', 35),
+        airQuality: { aqi: 55, pm25: 11.6, co2: 413, ozone: 30, label: 'Moderate', color: '#eab308' },
+        alerts: [],
+        historical: makeHistorical(6, 1)
     },
+
     toronto: {
         current: {
             city: 'Toronto', country: 'Canada', countryEmoji: '🇨🇦',
@@ -173,8 +241,15 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 4, low: -2, condition: 'Partly Cloudy', conditionCode: 'partly-cloudy', rainProbability: 20 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 6, low: 0, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 10 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 3, low: -4, condition: 'Rainy', conditionCode: 'rainy', rainProbability: 55 },
-        ]
+        ],
+        hourly: makeHourly(-3, 'snowy', 80),
+        airQuality: { aqi: 35, pm25: 6.2, co2: 409, ozone: 27, label: 'Good', color: '#22c55e' },
+        alerts: [
+            { id: 'd1', title: '🌨️ Blizzard Warning', message: 'Whiteout conditions possible. Wind chill −20°C. Keep emergency kit in vehicle.', severity: 'danger' }
+        ],
+        historical: makeHistorical(-2, -8)
     },
+
     singapore: {
         current: {
             city: 'Singapore', country: 'Singapore', countryEmoji: '🇸🇬',
@@ -192,31 +267,54 @@ const MOCK_DATA: Record<string, WeatherData> = {
             { date: 'Thu', fullDate: 'Thu, Feb 27', high: 31, low: 25, condition: 'Partly Cloudy', conditionCode: 'partly-cloudy', rainProbability: 40 },
             { date: 'Fri', fullDate: 'Fri, Feb 28', high: 32, low: 25, condition: 'Sunny', conditionCode: 'sunny', rainProbability: 20 },
             { date: 'Sat', fullDate: 'Sat, Mar 01', high: 30, low: 24, condition: 'Rainy', conditionCode: 'rainy', rainProbability: 70 },
-        ]
+        ],
+        hourly: makeHourly(30, 'stormy', 85),
+        airQuality: { aqi: 66, pm25: 15.2, co2: 418, ozone: 35, label: 'Moderate', color: '#eab308' },
+        alerts: [
+            { id: 'e1', title: '⛈️ Thunderstorm Alert', message: 'Lightning risk is high. Seek shelter immediately if outdoors. Flash flooding possible in low-lying areas.', severity: 'danger' }
+        ],
+        historical: makeHistorical(31, 24)
     }
+};
+
+// City geo coords for geolocation nearest-city lookup
+export const CITY_GEO: Record<string, { lat: number; lon: number }> = {
+    'London': { lat: 51.5, lon: -0.12 },
+    'Tokyo': { lat: 35.68, lon: 139.69 },
+    'Mumbai': { lat: 19.07, lon: 72.87 },
+    'New York': { lat: 40.71, lon: -74.0 },
+    'Paris': { lat: 48.85, lon: 2.35 },
+    'Dubai': { lat: 25.2, lon: 55.27 },
+    'Sydney': { lat: -33.87, lon: 151.21 },
+    'Berlin': { lat: 52.52, lon: 13.4 },
+    'Toronto': { lat: 43.65, lon: -79.38 },
+    'Singapore': { lat: 1.35, lon: 103.82 },
 };
 
 @Injectable({ providedIn: 'root' })
 export class WeatherService {
-    private cities = Object.keys(MOCK_DATA).map(k =>
-        MOCK_DATA[k].current.city
-    );
+    private cities = Object.keys(MOCK_DATA).map(k => MOCK_DATA[k].current.city);
 
-    getCities(): string[] {
-        return this.cities;
-    }
+    getCities(): string[] { return this.cities; }
 
     getWeather(city: string): Observable<WeatherData | null> {
         const key = city.toLowerCase().trim();
-        // 1. Exact match
-        if (MOCK_DATA[key]) {
-            return of(MOCK_DATA[key]).pipe(delay(400));
+        if (MOCK_DATA[key]) return of(MOCK_DATA[key]).pipe(delay(400));
+        const matchedKey = Object.keys(MOCK_DATA).find(k => k.includes(key) || key.includes(k));
+        return of(matchedKey ? MOCK_DATA[matchedKey] : null).pipe(delay(400));
+    }
+
+    getNearestCity(lat: number, lon: number): string {
+        let nearest = 'London';
+        let minDist = Infinity;
+        for (const [city, coords] of Object.entries(CITY_GEO)) {
+            const d = Math.sqrt(Math.pow(lat - coords.lat, 2) + Math.pow(lon - coords.lon, 2));
+            if (d < minDist) { minDist = d; nearest = city; }
         }
-        // 2. Fuzzy: find any city whose key contains the search term OR vice versa
-        const matchedKey = Object.keys(MOCK_DATA).find(k =>
-            k.includes(key) || key.includes(k)
-        );
-        const data = matchedKey ? MOCK_DATA[matchedKey] : null;
-        return of(data).pipe(delay(400));
+        return nearest;
+    }
+
+    getAllCityPreviews(): { city: string; data: WeatherData }[] {
+        return Object.values(MOCK_DATA).map(d => ({ city: d.current.city, data: d }));
     }
 }

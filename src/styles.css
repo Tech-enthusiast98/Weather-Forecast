@@ -1,4 +1,4 @@
-/* ===== Global Reset & Variables ===== */
+/* ===== Global Reset ===== */
 *,
 *::before,
 *::after {
@@ -7,7 +7,9 @@
     padding: 0;
 }
 
-:root {
+/* ===== Theme Variables ===== */
+:root,
+[data-theme="dark"] {
     --bg-primary: #0f0f1a;
     --bg-secondary: #161628;
     --glass-bg: rgba(255, 255, 255, 0.05);
@@ -16,19 +18,44 @@
     --accent-blue: #60a5fa;
     --text-primary: #ffffff;
     --text-muted: rgba(255, 255, 255, 0.5);
-    --radius-lg: 20px;
-    --radius-md: 14px;
+    --nav-rgb: 15, 15, 26;
+    --alert-info-bg: rgba(96, 165, 250, 0.12);
+    --alert-info-bd: rgba(96, 165, 250, 0.35);
+    --alert-warn-bg: rgba(251, 191, 36, 0.12);
+    --alert-warn-bd: rgba(251, 191, 36, 0.35);
+    --alert-dng-bg: rgba(239, 68, 68, 0.12);
+    --alert-dng-bd: rgba(239, 68, 68, 0.35);
 }
 
+[data-theme="light"] {
+    --bg-primary: #eef2ff;
+    --bg-secondary: #e0e7f7;
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --accent: #d97706;
+    --accent-blue: #2563eb;
+    --text-primary: #1e1b4b;
+    --text-muted: rgba(0, 0, 0, 0.45);
+    --nav-rgb: 238, 242, 255;
+    --alert-info-bg: rgba(37, 99, 235, 0.1);
+    --alert-info-bd: rgba(37, 99, 235, 0.3);
+    --alert-warn-bg: rgba(217, 119, 6, 0.1);
+    --alert-warn-bd: rgba(217, 119, 6, 0.3);
+    --alert-dng-bg: rgba(220, 38, 38, 0.1);
+    --alert-dng-bd: rgba(220, 38, 38, 0.3);
+}
+
+/* ===== Base ===== */
 body {
     font-family: 'Inter', sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background 0.4s, color 0.4s;
 }
 
-/* ===== Animated Background ===== */
+/* ===== Animated Background Base ===== */
 body::before {
     content: '';
     position: fixed;
@@ -39,25 +66,75 @@ body::before {
         radial-gradient(ellipse at 50% 50%, rgba(167, 139, 250, 0.06) 0%, transparent 60%);
     pointer-events: none;
     z-index: 0;
+    transition: background 0.6s;
 }
 
-/* ===== Glassmorphism Card ===== */
+/* ===== Condition-specific animated backgrounds ===== */
+body.bg-sunny::before {
+    background: radial-gradient(ellipse at 70% 10%, rgba(251, 191, 36, 0.25) 0%, transparent 55%),
+        radial-gradient(ellipse at 30% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 50%);
+    animation: sunPulse 6s ease-in-out infinite;
+}
+
+@keyframes sunPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+body.bg-rainy::before,
+body.bg-stormy::before {
+    background: radial-gradient(ellipse at 50% 0%, rgba(96, 165, 250, 0.2) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 80%, rgba(59, 130, 246, 0.12) 0%, transparent 50%);
+    animation: rainShift 4s ease-in-out infinite;
+}
+
+@keyframes rainShift {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+body.bg-snowy::before {
+    background: radial-gradient(ellipse at 50% 0%, rgba(200, 220, 255, 0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 80%, rgba(180, 200, 255, 0.1) 0%, transparent 50%);
+}
+
+body.bg-cloudy::before,
+body.bg-partly-cloudy::before {
+    background: radial-gradient(ellipse at 40% 30%, rgba(148, 163, 184, 0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 70%, rgba(100, 116, 139, 0.08) 0%, transparent 50%);
+}
+
+/* ===== Glass Card ===== */
 .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
-    border-radius: var(--radius-lg);
+    border-radius: 20px;
     padding: 1.5rem;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .glass-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
 }
 
-/* ===== Section Title (shared) ===== */
+/* ===== Section Title ===== */
 .section-title {
     font-size: 0.85rem;
     font-weight: 600;

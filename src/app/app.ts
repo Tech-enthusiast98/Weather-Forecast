@@ -10,12 +10,8 @@ import { NavbarComponent } from './navbar/navbar';
     <app-navbar></app-navbar>
     <router-outlet></router-outlet>
   `,
-  styles: [`
-    :host {
-      display: block;
-    }
-  `]
+  styles: [`:host { display: block; min-height: 100vh; }`]
 })
 export class App {
-  title = 'my-angular-app';
+  title = 'WeatherCast';
 }

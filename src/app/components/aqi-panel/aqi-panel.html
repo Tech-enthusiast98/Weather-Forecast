@@ -1,0 +1,45 @@
+<div class="aqi-card glass-card" *ngIf="airQuality">
+    <div class="section-title"><i class="bi bi-wind"></i> Air Quality Index</div>
+
+    <div class="aqi-header">
+        <div class="aqi-number" [style.color]="airQuality.color">{{ airQuality.aqi }}</div>
+        <div class="aqi-badge" [style.background]="airQuality.color + '22'"
+            [style.border]="'1px solid ' + airQuality.color" [style.color]="airQuality.color">
+            {{ airQuality.label }}
+        </div>
+    </div>
+
+    <div class="aqi-bar-bg">
+        <div class="aqi-bar-fill" [style.width.%]="aqiPercent" [style.background]="airQuality.color"></div>
+        <div class="aqi-bar-labels">
+            <span>Good</span><span>Moderate</span><span>Unhealthy</span>
+        </div>
+    </div>
+
+    <div class="pollutants">
+        <div class="pollutant">
+            <span class="p-label">PM2.5</span>
+            <div class="p-bar-bg">
+                <div class="p-bar" [style.width.%]="(airQuality.pm25 / 75) * 100"
+                    [style.background]="getBarColor(airQuality.pm25, 75)"></div>
+            </div>
+            <span class="p-val">{{ airQuality.pm25 }} μg/m³</span>
+        </div>
+        <div class="pollutant">
+            <span class="p-label">CO₂</span>
+            <div class="p-bar-bg">
+                <div class="p-bar" [style.width.%]="((airQuality.co2 - 400) / 200) * 100"
+                    [style.background]="getBarColor(airQuality.co2 - 400, 200)"></div>
+            </div>
+            <span class="p-val">{{ airQuality.co2 }} ppm</span>
+        </div>
+        <div class="pollutant">
+            <span class="p-label">Ozone</span>
+            <div class="p-bar-bg">
+                <div class="p-bar" [style.width.%]="(airQuality.ozone / 70) * 100"
+                    [style.background]="getBarColor(airQuality.ozone, 70)"></div>
+            </div>
+            <span class="p-val">{{ airQuality.ozone }} ppb</span>
+        </div>
+    </div>
+</div>

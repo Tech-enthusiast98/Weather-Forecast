@@ -1,0 +1,40 @@
+<div class="explorer-page">
+    <div class="explorer-header">
+        <h1>🌍 City Explorer</h1>
+        <p>Browse weather across all available cities</p>
+    </div>
+
+    <div class="city-grid">
+        <div class="city-card glass-card" *ngFor="let item of cities" (click)="navigate(item.city)"
+            [attr.aria-label]="'View weather for ' + item.city" role="button" tabindex="0"
+            (keyup.enter)="navigate(item.city)">
+            <div class="card-top">
+                <div class="cc-city">
+                    <span class="cc-emoji">{{ item.data.current.countryEmoji }}</span>
+                    <div>
+                        <div class="cc-name">{{ item.city }}</div>
+                        <div class="cc-country">{{ item.data.current.country }}</div>
+                    </div>
+                </div>
+                <button class="fav-btn" (click)="toggleFav($event, item.city)"
+                    [attr.aria-label]="(favService.isFavourite(item.city) ? 'Remove from' : 'Add to') + ' favourites'"
+                    [title]="favService.isFavourite(item.city) ? 'Remove favourite' : 'Add favourite'">
+                    {{ favService.isFavourite(item.city) ? '⭐' : '☆' }}
+                </button>
+            </div>
+
+            <div class="cc-temp-row">
+                <span class="cc-icon">{{ getIcon(item.data.current.conditionCode) }}</span>
+                <span class="cc-temp">{{ getTemp(item.data.current.temperature) }}°</span>
+            </div>
+            <div class="cc-condition">{{ item.data.current.condition }}</div>
+            <div class="cc-climate">{{ item.data.current.climateType }}</div>
+
+            <div class="cc-meta">
+                <span><i class="bi bi-droplet"></i> {{ item.data.current.humidity }}%</span>
+                <span><i class="bi bi-wind"></i> {{ item.data.current.windSpeed }} km/h</span>
+                <span><i class="bi bi-sun"></i> UV {{ item.data.current.uvIndex }}</span>
+            </div>
+        </div>
+    </div>
+</div>

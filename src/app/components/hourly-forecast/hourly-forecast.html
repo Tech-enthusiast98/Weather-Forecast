@@ -1,0 +1,14 @@
+<div class="hourly-card glass-card" *ngIf="hourly.length">
+    <div class="section-title"><i class="bi bi-clock-history"></i> 24-Hour Forecast</div>
+    <div class="hourly-strip">
+        <div class="hourly-slot" *ngFor="let h of hourly" [class.now]="h.isNow"
+            [attr.aria-label]="h.hour + ': ' + getTemp(h.temp) + '° ' + h.conditionCode">
+            <div class="h-time">{{ h.isNow ? 'Now' : h.hour }}</div>
+            <div class="h-icon">{{ getIcon(h.conditionCode) }}</div>
+            <div class="h-temp">{{ getTemp(h.temp) }}°</div>
+            <div class="h-rain" *ngIf="h.rainProbability > 20">
+                <i class="bi bi-droplet-fill"></i>{{ h.rainProbability }}%
+            </div>
+        </div>
+    </div>
+</div>

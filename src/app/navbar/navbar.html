@@ -1,28 +1,62 @@
-<nav class="app-navbar">
+<nav class="app-navbar" [attr.data-theme]="theme">
   <div class="navbar-brand">
     <span class="brand-icon">🌤️</span>
-    <span class="brand-text">WeatherCast</span>
+    <a class="brand-text" routerLink="/explore">WeatherCast</a>
   </div>
 
   <div class="search-wrap">
     <div class="search-box">
       <i class="bi bi-search search-icon"></i>
       <input type="text" id="city-search" class="search-input" placeholder="Search city..." [(ngModel)]="searchQuery"
-        (input)="onInput()" (keyup.enter)="onSearch()" (blur)="hideDropdown()" autocomplete="off" />
-      <button class="search-btn" (click)="onSearch()">
+        (input)="onInput()" (keyup.enter)="onSearch()" (blur)="hideDropdown()" aria-label="City search"
+        autocomplete="off" />
+      <button class="search-btn" (click)="onSearch()" aria-label="Search">
         <i class="bi bi-arrow-right-circle-fill"></i>
       </button>
     </div>
 
     <!-- Autocomplete dropdown -->
-    <div class="autocomplete-dropdown" *ngIf="showDropdown">
-      <div class="dropdown-item" *ngFor="let city of filteredCities" (mousedown)="selectCity(city)">
+    <div class="autocomplete-dropdown" *ngIf="showDropdown" role="listbox">
+      <div class="dropdown-item" *ngFor="let city of filteredCities" (mousedown)="selectCity(city)" role="option">
         <i class="bi bi-geo-alt"></i> {{ city }}
       </div>
     </div>
+
+    <!-- History & Favourites bar -->
+    <div class="quick-bar" *ngIf="history.length > 0 || favourites.length > 0">
+      <ng-container *ngIf="history.length > 0">
+        <span class="bar-label">Recent:</span>
+        <button class="chip" *ngFor="let c of history" (click)="selectCity(c)" [title]="c">{{ c }}</button>
+        <button class="chip chip-clear" (click)="clearHistory()" title="Clear history">✕</button>
+      </ng-container>
+      <ng-container *ngIf="favourites.length > 0">
+        <span class="bar-label ml-2">⭐</span>
+        <button class="chip chip-fav" *ngFor="let c of favourites" (click)="selectCity(c)" [title]="c">{{ c }}</button>
+      </ng-container>
+    </div>
   </div>
 
-  <div class="navbar-right">
-    <span class="datetime">{{ allCities.length }} Cities Available</span>
+  <div class="navbar-controls">
+    <!-- Geolocation -->
+    <button class="ctrl-btn" (click)="useLocation()" [class.spinning]="locating" aria-label="Use my location"
+      title="Use my location">
+      <i [class]="locating ? 'bi bi-arrow-repeat' : 'bi bi-geo-fill'"></i>
+    </button>
+
+    <!-- Unit Toggle -->
+    <button class="unit-toggle" (click)="toggleUnit()" [attr.aria-label]="'Switch to °' + (unit === 'C' ? 'F' : 'C')">
+      °{{ unit }}
+    </button>
+
+    <!-- Theme Toggle -->
+    <button class="ctrl-btn" (click)="toggleTheme()"
+      [attr.aria-label]="'Switch to ' + (theme === 'dark' ? 'light' : 'dark') + ' mode'" title="Toggle theme">
+      <i [class]="theme === 'dark' ? 'bi bi-brightness-high-fill' : 'bi bi-moon-stars-fill'"></i>
+    </button>
+
+    <!-- Explorer link -->
+    <a class="ctrl-btn" routerLink="/explore" title="Explore all cities" aria-label="City explorer">
+      <i class="bi bi-grid-fill"></i>
+    </a>
   </div>
 </nav>

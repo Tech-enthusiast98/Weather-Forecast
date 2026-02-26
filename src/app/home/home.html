@@ -1,3 +1,15 @@
+<!-- Weather Alerts Banner -->
+<div class="alerts-wrap" *ngIf="visibleAlerts.length > 0">
+    <div class="alert-banner" *ngFor="let alert of visibleAlerts" [class]="'alert-' + alert.severity" role="alert"
+        [attr.aria-label]="alert.title">
+        <div class="alert-content">
+            <strong>{{ alert.title }}</strong>
+            <span>{{ alert.message }}</span>
+        </div>
+        <button class="alert-close" (click)="dismissAlert(alert.id)" aria-label="Dismiss alert">✕</button>
+    </div>
+</div>
+
 <!-- Loading Spinner -->
 <div class="loading-wrap" *ngIf="loading">
     <div class="spinner"></div>
@@ -8,12 +20,21 @@
 <div class="not-found" *ngIf="!loading && notFound">
     <div class="nf-icon">🔍</div>
     <h3>City Not Found</h3>
-    <p>Try searching for: London, Tokyo, Mumbai, New York, Paris, Dubai, Sydney, Berlin, Toronto, or Singapore.</p>
+    <p>Try: London, Tokyo, Mumbai, New York, Paris, Dubai, Sydney, Berlin, Toronto, or Singapore.</p>
 </div>
 
 <!-- Dashboard -->
 <div class="dashboard fade-up" *ngIf="!loading && weatherData">
-    <!-- Row 1: Current weather (large) + Wind/Rain -->
+    <!-- City + Favourite header -->
+    <div class="city-bar">
+        <span class="city-bar-name">{{ weatherData.current.city }}, {{ weatherData.current.country }}</span>
+        <button class="fav-toggle" (click)="toggleFav()"
+            [attr.aria-label]="isFav() ? 'Remove from favourites' : 'Add to favourites'">
+            {{ isFav() ? '⭐' : '☆' }}
+        </button>
+    </div>
+
+    <!-- Row 1: Current + Wind/Rain -->
     <div class="dash-row row-top">
         <div class="col-main">
             <app-current-weather [weather]="weatherData.current" />
@@ -23,17 +44,34 @@
         </div>
     </div>
 
-    <!-- Row 2: Sun times + Climate map -->
+    <!-- Row 2: Hourly forecast (full width) -->
+    <div class="dash-row">
+        <div class="col-full">
+            <app-hourly-forecast [hourly]="weatherData.hourly" />
+        </div>
+    </div>
+
+    <!-- Row 3: Sun times + AQI -->
     <div class="dash-row row-mid">
         <div class="col-half">
             <app-sun-times [weather]="weatherData.current" />
         </div>
         <div class="col-half">
+            <app-aqi-panel [airQuality]="weatherData.airQuality" />
+        </div>
+    </div>
+
+    <!-- Row 4: Historical Chart + Climate Map -->
+    <div class="dash-row row-mid">
+        <div class="col-main">
+            <app-historical-chart [historical]="weatherData.historical" />
+        </div>
+        <div class="col-side">
             <app-climate-map [weather]="weatherData.current" />
         </div>
     </div>
 
-    <!-- Row 3: 5-day forecast (full width) -->
+    <!-- Row 5: 5-day forecast (full width) -->
     <div class="dash-row row-bottom">
         <div class="col-full">
             <app-forecast [forecast]="weatherData.forecast" />
